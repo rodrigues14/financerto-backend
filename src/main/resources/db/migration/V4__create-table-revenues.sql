@@ -1,7 +1,3 @@
-CREATE TYPE category_revenue AS ENUM (
-	'SALARIO', 'RENDA_EXTRA', 'INVESTIMENTOS', 'ALUGUEL', 'VENDAS', 'PRESENTES', 'OUTRA'
-);
-
 CREATE TABLE revenues(
-	category category_revenue
+	category TEXT
 ) INHERITS(finance_transactions);

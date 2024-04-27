@@ -2,24 +2,22 @@ package com.lucasdev.financerto.domain.financetransaction;
 
 import com.lucasdev.financerto.domain.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "finance_transactions")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class FinanceTransaction {
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class FinanceTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
     private double amount;

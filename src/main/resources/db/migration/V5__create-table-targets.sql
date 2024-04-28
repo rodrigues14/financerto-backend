@@ -5,6 +5,6 @@ CREATE TABLE targets(
 	target_amount NUMERIC(10,2) NOT NULL,
 	current_amount NUMERIC(10,2) NOT NULL,
 	deadline DATE,
-	category category_target,
+	category VARCHAR(100),
 	progress VARCHAR(7) NOT NULL
 );

@@ -7,23 +7,18 @@ import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
 
-public record RevenueDTO(
+public record RevenueUpdateDTO(
         String id,
-        @NotBlank
-        String userId,
-        @NotNull
         Double amount,
         String description,
-        @NotNull
         @Past
         LocalDate date,
-        @NotNull
         Methods method,
-        @NotNull
         CategoryRevenue category
 ) {
-    public RevenueDTO(Revenue revenue) {
-        this(revenue.getId(), revenue.getUser().getId(), revenue.getAmount(), revenue.getDescription(),
-                revenue.getDate(), revenue.getMethod(), revenue.getCategory());
-    }
+        public RevenueUpdateDTO(Revenue revenue) {
+                this(revenue.getId(), revenue.getAmount(), revenue.getDescription(),
+                        revenue.getDate(), revenue.getMethod(), revenue.getCategory());
+
+        }
 }

@@ -26,4 +26,12 @@ public class Revenue extends FinanceTransaction {
         this.setMethod(data.method());
         this.category = data.category();
     }
+
+    public void update(RevenueUpdateDTO data) {
+        if (data.amount() != null) this.setAmount(data.amount());
+        if (data.description() != null) this.setDescription(data.description());
+        if (data.date() != null) this.setDate(data.date());
+        if (data.method() != null) this.setMethod(data.method());
+        if (data.category() != null) this.category = data.category();
+    }
 }

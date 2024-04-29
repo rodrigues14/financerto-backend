@@ -5,6 +5,7 @@ import com.lucasdev.financerto.domain.expense.ExpenseDTO;
 import com.lucasdev.financerto.domain.expense.ExpenseRepository;
 import com.lucasdev.financerto.domain.expense.ExpenseUpdateDTO;
 import com.lucasdev.financerto.domain.user.UserRepository;
+import com.lucasdev.financerto.infra.exceptions.ValidateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,12 +29,15 @@ public class ExpenseController {
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody ExpenseDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        var user = userRepository.getReferenceById(data.userId());
-        var expense = new Expense(user, data);
-        expenseRepository.save(expense);
+        var user = userRepository.findById(data.userId());
+        if (user.isPresent()) {
+            var expense = new Expense(user.get(), data);
+            expenseRepository.save(expense);
 
-        var uri = uriComponentsBuilder.path("/expense/{id}").buildAndExpand(expense.getId()).toUri();
-        return ResponseEntity.created(uri).body(new ExpenseDTO(expense));
+            var uri = uriComponentsBuilder.path("/expense/{id}").buildAndExpand(expense.getId()).toUri();
+            return ResponseEntity.created(uri).body(new ExpenseDTO(expense));
+        }
+        return ResponseEntity.badRequest().body("Invalid user id");
     }
 
     @GetMapping("/{id}")

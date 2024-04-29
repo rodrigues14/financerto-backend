@@ -30,12 +30,15 @@ public class RevenueController {
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid RevenueDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        User user = userRepository.getReferenceById(data.userId());
-        Revenue revenue = new Revenue(user, data);
-        revenueRepository.save(revenue);
+        var user = userRepository.findById(data.userId());
+        if (user.isPresent()) {
+            Revenue revenue = new Revenue(user.get(), data);
+            revenueRepository.save(revenue);
 
-        var uri = uriComponentsBuilder.path("/revenue/{id}").buildAndExpand(revenue.getId()).toUri();
-        return ResponseEntity.created(uri).body(new RevenueDTO(revenue));
+            var uri = uriComponentsBuilder.path("/revenue/{id}").buildAndExpand(revenue.getId()).toUri();
+            return ResponseEntity.created(uri).body(new RevenueDTO(revenue));
+        }
+        return ResponseEntity.badRequest().body("Invalid user id");
     }
 
     @GetMapping("/{id}")

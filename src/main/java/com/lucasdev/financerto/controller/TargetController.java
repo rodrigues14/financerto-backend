@@ -28,13 +28,16 @@ public class TargetController {
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid TargetDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        targetService.validateTargetAndCurrentAmountToRegister(data);
-        var user = userRepository.getReferenceById(data.userId());
-        var target = new Target(user, data);
-        targetRepository.save(target);
+        var user = userRepository.findById(data.userId());
+        if (user.isPresent()) {
+            targetService.validateTargetAndCurrentAmountToRegister(data);
+            var target = new Target(user.get(), data);
+            targetRepository.save(target);
 
-        var uri = uriComponentsBuilder.path("/target/{id}").buildAndExpand(target.getId()).toUri();
-        return ResponseEntity.created(uri).body(new TargetResponseDTO(target));
+            var uri = uriComponentsBuilder.path("/target/{id}").buildAndExpand(target.getId()).toUri();
+            return ResponseEntity.created(uri).body(new TargetResponseDTO(target));
+        }
+        return ResponseEntity.badRequest().body("Invalid user id");
     }
 
     @GetMapping("/{id}")

@@ -22,9 +22,13 @@ public class TargetController {
     @Autowired
     private TargetRepository targetRepository;
 
+    @Autowired
+    private TargetService targetService;
+
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid TargetDTO data, UriComponentsBuilder uriComponentsBuilder) {
+        targetService.validateTargetAndCurrentAmountToRegister(data);
         var user = userRepository.getReferenceById(data.userId());
         var target = new Target(user, data);
         targetRepository.save(target);
@@ -48,6 +52,7 @@ public class TargetController {
     @PutMapping
     @Transactional
     public ResponseEntity update(@RequestBody TargetUpdateDTO data) {
+        targetService.validateTargetAndCurrentAmountToUpdate(data);
         var target = targetRepository.getReferenceById(data.id());
         target.update(data);
 

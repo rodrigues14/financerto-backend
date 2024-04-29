@@ -35,9 +35,8 @@ public class TargetController {
 
     @GetMapping("/{id}")
     public ResponseEntity findById(@PathVariable String id) {
-        var target = targetRepository.findById(id);
-        if (target.isPresent()) return ResponseEntity.ok(new TargetResponseDTO(target.get()));
-        return ResponseEntity.notFound().build();
+        var target = targetRepository.getReferenceById(id);
+        return ResponseEntity.ok(new TargetResponseDTO(target));
     }
 
     @GetMapping

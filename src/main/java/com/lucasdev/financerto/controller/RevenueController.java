@@ -40,9 +40,8 @@ public class RevenueController {
 
     @GetMapping("/{id}")
     public ResponseEntity findById(@PathVariable String id) {
-        var revenue = revenueRepository.findById(id);
-        if (revenue.isPresent()) return ResponseEntity.ok(new RevenueDTO(revenue.get()));
-        return ResponseEntity.notFound().build();
+        var revenue = revenueRepository.getReferenceById(id);
+        return ResponseEntity.ok(new RevenueDTO(revenue));
     }
 
     @GetMapping

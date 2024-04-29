@@ -38,9 +38,8 @@ public class ExpenseController {
 
     @GetMapping("/{id}")
     public ResponseEntity findbyId(@PathVariable String id) {
-        var expense = expenseRepository.findById(id);
-        if (expense.isPresent()) return ResponseEntity.ok(new ExpenseDTO(expense.get()));
-        return ResponseEntity.notFound().build();
+        var expense = expenseRepository.getReferenceById(id);
+        return ResponseEntity.ok(new ExpenseDTO(expense));
     }
 
     @GetMapping

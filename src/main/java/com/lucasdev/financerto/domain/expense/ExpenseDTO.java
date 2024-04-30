@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 
 public record ExpenseDTO(
-        String id,
         @NotBlank
         String userId,
         @NotNull
@@ -27,7 +26,7 @@ public record ExpenseDTO(
         CategoryExpense category
 ) {
         public ExpenseDTO(Expense expense) {
-                this(expense.getId(), expense.getUser().getId(), expense.getAmount(),
+                this(expense.getUser().getId(), expense.getAmount(),
                         expense.getDescription(), expense.getDate(), expense.getMethod(),
                         expense.getLocal(), expense.getCategory());
         }

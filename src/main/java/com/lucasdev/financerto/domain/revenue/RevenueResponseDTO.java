@@ -8,23 +8,17 @@ import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
-public record RevenueDTO(
-        @NotBlank
+public record RevenueResponseDTO (
+        String id,
         String userId,
-        @NotNull
-        @Positive
         Double amount,
         String description,
-        @NotNull
-        @Past
         LocalDate date,
-        @NotNull
         Methods method,
-        @NotNull
         CategoryRevenue category
 ) {
-    public RevenueDTO(Revenue revenue) {
-        this(revenue.getUser().getId(), revenue.getAmount(), revenue.getDescription(),
+    public RevenueResponseDTO(Revenue revenue) {
+        this(revenue.getId(), revenue.getUser().getId(), revenue.getAmount(), revenue.getDescription(),
                 revenue.getDate(), revenue.getMethod(), revenue.getCategory());
     }
 }

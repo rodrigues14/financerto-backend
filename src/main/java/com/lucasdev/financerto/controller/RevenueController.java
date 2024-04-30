@@ -1,10 +1,6 @@
 package com.lucasdev.financerto.controller;
 
-import com.lucasdev.financerto.domain.revenue.Revenue;
-import com.lucasdev.financerto.domain.revenue.RevenueRepository;
-import com.lucasdev.financerto.domain.revenue.RevenueDTO;
-import com.lucasdev.financerto.domain.revenue.RevenueUpdateDTO;
-import com.lucasdev.financerto.domain.user.User;
+import com.lucasdev.financerto.domain.revenue.*;
 import com.lucasdev.financerto.domain.user.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +32,7 @@ public class RevenueController {
             revenueRepository.save(revenue);
 
             var uri = uriComponentsBuilder.path("/revenue/{id}").buildAndExpand(revenue.getId()).toUri();
-            return ResponseEntity.created(uri).body(new RevenueDTO(revenue));
+            return ResponseEntity.created(uri).body(new RevenueResponseDTO(revenue));
         }
         return ResponseEntity.badRequest().body("Invalid user id");
     }
@@ -44,12 +40,12 @@ public class RevenueController {
     @GetMapping("/{id}")
     public ResponseEntity findById(@PathVariable String id) {
         var revenue = revenueRepository.getReferenceById(id);
-        return ResponseEntity.ok(new RevenueDTO(revenue));
+        return ResponseEntity.ok(new RevenueResponseDTO(revenue));
     }
 
     @GetMapping
-    public ResponseEntity<Page<RevenueDTO>> list(@PageableDefault(size = 10, sort = {"date"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        var page = revenueRepository.findAll(pageable).map(RevenueDTO::new);
+    public ResponseEntity<Page<RevenueResponseDTO>> list(@PageableDefault(size = 10, sort = {"date"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        var page = revenueRepository.findAll(pageable).map(RevenueResponseDTO::new);
         return ResponseEntity.ok(page);
     }
 
@@ -58,7 +54,7 @@ public class RevenueController {
     public ResponseEntity update(@RequestBody @Valid RevenueUpdateDTO data) {
         var revenue = revenueRepository.getReferenceById(data.id());
         revenue.update(data);
-        return ResponseEntity.ok(new RevenueUpdateDTO(revenue));
+        return ResponseEntity.ok(new RevenueResponseDTO(revenue));
     }
 
     @DeleteMapping("/{id}")

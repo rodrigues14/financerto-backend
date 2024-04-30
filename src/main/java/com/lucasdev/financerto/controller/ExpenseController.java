@@ -2,7 +2,6 @@ package com.lucasdev.financerto.controller;
 
 import com.lucasdev.financerto.domain.expense.*;
 import com.lucasdev.financerto.domain.user.UserRepository;
-import com.lucasdev.financerto.infra.exceptions.ValidateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

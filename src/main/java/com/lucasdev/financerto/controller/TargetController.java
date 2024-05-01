@@ -28,16 +28,7 @@ public class TargetController {
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid TargetDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        var user = userRepository.findById(data.userId());
-        if (user.isPresent()) {
-            targetService.validateTargetAndCurrentAmountToRegister(data);
-            var target = new Target(user.get(), data);
-            targetRepository.save(target);
-
-            var uri = uriComponentsBuilder.path("/target/{id}").buildAndExpand(target.getId()).toUri();
-            return ResponseEntity.created(uri).body(new TargetResponseDTO(target));
-        }
-        return ResponseEntity.badRequest().body("Invalid user id");
+        return targetService.register(data, uriComponentsBuilder);
     }
 
     @GetMapping("/{id}")
@@ -54,12 +45,8 @@ public class TargetController {
 
     @PutMapping
     @Transactional
-    public ResponseEntity update(@RequestBody TargetUpdateDTO data) {
-        targetService.validateTargetAndCurrentAmountToUpdate(data);
-        var target = targetRepository.getReferenceById(data.id());
-        target.update(data);
-
-        return ResponseEntity.ok(new TargetResponseDTO(target));
+    public ResponseEntity update(@RequestBody @Valid TargetUpdateDTO data) {
+        return targetService.update(data);
     }
 
     @DeleteMapping("/{id}")

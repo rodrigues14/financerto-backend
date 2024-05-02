@@ -29,8 +29,8 @@ public class TargetController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity register(@RequestBody @Valid TargetDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        return targetService.register(data, uriComponentsBuilder);
+    public ResponseEntity register(@RequestBody @Valid TargetDTO data, UriComponentsBuilder uriComponentsBuilder, Authentication authentication) {
+        return targetService.register(authentication, data, uriComponentsBuilder);
     }
 
     @GetMapping("/{id}")

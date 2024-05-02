@@ -27,17 +27,14 @@ public class TargetService {
     @Autowired
     private ValidateTargetAndCurrentAmountToUpdate validateTargetAndCurrentAmountToUpdate;
 
-    public ResponseEntity register(TargetDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        var user = userRepository.findById(data.userId());
-        if (user.isPresent()) {
-            validateTargetAndCurrentAmountToRegister.validate(data);
-            var target = new Target(user.get(), data);
-            targetRepository.save(target);
+    public ResponseEntity register(Authentication authentication ,TargetDTO data, UriComponentsBuilder uriComponentsBuilder) {
+        User currentUser = (User) authentication.getPrincipal();
 
-            var uri = uriComponentsBuilder.path("/target/{id}").buildAndExpand(target.getId()).toUri();
-            return ResponseEntity.created(uri).body(new TargetResponseDTO(target));
-        }
-        return ResponseEntity.badRequest().body("Invalid user id");
+        validateTargetAndCurrentAmountToRegister.validate(data);
+        var target = new Target(currentUser, data);
+        targetRepository.save(target);
+        var uri = uriComponentsBuilder.path("/target/{id}").buildAndExpand(target.getId()).toUri();
+        return ResponseEntity.created(uri).body(new TargetResponseDTO(target));
     }
 
     public ResponseEntity list(Authentication authentication, Pageable pageable) {

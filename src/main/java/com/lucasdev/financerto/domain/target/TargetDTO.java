@@ -6,14 +6,12 @@ import java.time.LocalDate;
 
 public record TargetDTO(
         @NotBlank
-        String userId,
-        @NotBlank
         String name,
         @NotNull
         @Positive
         Double targetAmount,
         @NotNull
-        @Positive
+        @PositiveOrZero
         Double currentAmount,
         @NotNull
         @Future

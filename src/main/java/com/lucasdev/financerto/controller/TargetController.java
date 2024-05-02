@@ -8,9 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
 
 @RestController
 @RequestMapping("/target")
@@ -38,9 +40,8 @@ public class TargetController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<TargetResponseDTO>> list(@PageableDefault(size = 10, sort = {"deadline"}) Pageable pageable) {
-        var page = targetRepository.findAll(pageable).map(TargetResponseDTO::new);
-        return ResponseEntity.ok(page);
+    public ResponseEntity<Page<TargetResponseDTO>> list(Authentication authentication, @PageableDefault(size = 10, sort = {"deadline"}) Pageable pageable) {
+        return targetService.list(authentication, pageable);
     }
 
     @PutMapping

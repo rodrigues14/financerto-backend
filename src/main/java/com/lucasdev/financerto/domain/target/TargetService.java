@@ -5,10 +5,12 @@ import com.lucasdev.financerto.domain.target.validations.ValidateTargetAndCurren
 import com.lucasdev.financerto.domain.user.User;
 import com.lucasdev.financerto.domain.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 
@@ -28,7 +30,7 @@ public class TargetService {
     private ValidateTargetAndCurrentAmountToUpdate validateTargetAndCurrentAmountToUpdate;
 
     public ResponseEntity register(Authentication authentication ,TargetDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = this.getCurrentUser(authentication);
 
         validateTargetAndCurrentAmountToRegister.validate(data);
         var target = new Target(currentUser, data);
@@ -37,19 +39,26 @@ public class TargetService {
         return ResponseEntity.created(uri).body(new TargetResponseDTO(target));
     }
 
-    public ResponseEntity list(Authentication authentication, Pageable pageable) {
-        User currentUser = (User) authentication.getPrincipal();
+    public ResponseEntity<Page<TargetResponseDTO>> list(Authentication authentication, Pageable pageable) {
+        User currentUser = this.getCurrentUser(authentication);
 
         var page = targetRepository.findAllByUserId(currentUser.getId() ,pageable).map(TargetResponseDTO::new);
         return ResponseEntity.ok(page);
     }
 
-    public ResponseEntity update(TargetUpdateDTO data) {
-        validateTargetAndCurrentAmountToUpdate.validate(data);
+    public ResponseEntity update(Authentication authentication, TargetUpdateDTO data) {
+        User currentUser = this.getCurrentUser(authentication);
         var target = targetRepository.getReferenceById(data.id());
+        if (!target.getUser().equals(currentUser)) {
+            return ResponseEntity.notFound().build();
+        }
+        validateTargetAndCurrentAmountToUpdate.validate(data);
         target.update(data);
-
         return ResponseEntity.ok(new TargetResponseDTO(target));
+    }
+
+    private User getCurrentUser(Authentication authentication) {
+        return (User) authentication.getPrincipal();
     }
 
 }

@@ -40,14 +40,14 @@ public class TargetController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<TargetResponseDTO>> list(Authentication authentication, @PageableDefault(size = 10, sort = {"deadline"}) Pageable pageable) {
+    public ResponseEntity<Page<TargetResponseDTO>> list(@PageableDefault(size = 10, sort = {"deadline"}) Pageable pageable, Authentication authentication) {
         return targetService.list(authentication, pageable);
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity update(@RequestBody @Valid TargetUpdateDTO data) {
-        return targetService.update(data);
+    public ResponseEntity update(@RequestBody @Valid TargetUpdateDTO data, Authentication authentication) {
+        return targetService.update(authentication, data);
     }
 
     @DeleteMapping("/{id}")

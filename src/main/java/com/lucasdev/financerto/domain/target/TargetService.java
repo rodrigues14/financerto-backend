@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.ErrorResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 
@@ -55,6 +54,16 @@ public class TargetService {
         validateTargetAndCurrentAmountToUpdate.validate(data);
         target.update(data);
         return ResponseEntity.ok(new TargetResponseDTO(target));
+    }
+
+    public ResponseEntity delete(Authentication authentication, String id) {
+        User currentUser = this.getCurrentUser(authentication);
+        var target = targetRepository.findById(id).orElse(null);
+        if (target == null || !target.getUser().equals(currentUser)) {
+            return ResponseEntity.badRequest().build();
+        }
+        targetRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     private User getCurrentUser(Authentication authentication) {

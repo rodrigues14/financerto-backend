@@ -52,9 +52,8 @@ public class TargetController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity delete(@PathVariable String id) {
-        targetRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity delete(@PathVariable String id, Authentication authentication) {
+        return targetService.delete(authentication, id);
     }
 
 }

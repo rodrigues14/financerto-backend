@@ -2,6 +2,7 @@ package com.lucasdev.financerto.domain.expense;
 
 import com.lucasdev.financerto.domain.user.User;
 import com.lucasdev.financerto.domain.user.UserRepository;
+import com.lucasdev.financerto.utils.RecoverAuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +20,11 @@ public class ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    @Autowired
+    private RecoverAuthenticatedUser recoverAuthenticatedUser;
+
     public ResponseEntity<ExpenseResponseDTO> registerExpense(ExpenseDTO data, UriComponentsBuilder uriComponentsBuilder, Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
         var expense = new Expense(currentUser, data);
         expenseRepository.save(expense);
 
@@ -29,7 +33,7 @@ public class ExpenseService {
     }
 
     public ResponseEntity<ExpenseResponseDTO> findExpenseById(String id, Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
         var expense = expenseRepository.getReferenceById(id);
         if (!expense.getUser().equals(currentUser)) {
             return ResponseEntity.notFound().build();
@@ -38,13 +42,13 @@ public class ExpenseService {
     }
 
     public ResponseEntity<Page<ExpenseResponseDTO>> listExpenses(Pageable pageable, Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
         var page = expenseRepository.findAllByUserId(currentUser.getId(), pageable).map(ExpenseResponseDTO::new);
         return ResponseEntity.ok(page);
     }
 
     public ResponseEntity<ExpenseResponseDTO> updateExpense(ExpenseUpdateDTO data, Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
         var expense = expenseRepository.getReferenceById(data.id());
         if (!expense.getUser().equals(currentUser)) {
             return ResponseEntity.notFound().build();
@@ -54,7 +58,7 @@ public class ExpenseService {
     }
 
     public ResponseEntity deleteExpense(String id, Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
         var expense = this.expenseRepository.findById(id).orElse(null);
         if (expense == null || !expense.getUser().equals(currentUser)) {
             return ResponseEntity.badRequest().build();

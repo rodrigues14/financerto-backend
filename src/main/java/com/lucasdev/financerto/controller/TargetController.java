@@ -34,9 +34,8 @@ public class TargetController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity findById(@PathVariable String id) {
-        var target = targetRepository.getReferenceById(id);
-        return ResponseEntity.ok(new TargetResponseDTO(target));
+    public ResponseEntity findById(@PathVariable String id, Authentication authentication) {
+        return targetService.findById(authentication, id);
     }
 
     @GetMapping

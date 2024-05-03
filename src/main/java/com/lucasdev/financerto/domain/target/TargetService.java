@@ -38,6 +38,15 @@ public class TargetService {
         return ResponseEntity.created(uri).body(new TargetResponseDTO(target));
     }
 
+    public ResponseEntity findById(Authentication authentication, String id) {
+        User currentUser = this.getCurrentUser(authentication);
+        var target = targetRepository.getReferenceById(id);
+        if (!target.getUser().equals(currentUser)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(new TargetResponseDTO(target));
+    }
+
     public ResponseEntity<Page<TargetResponseDTO>> list(Authentication authentication, Pageable pageable) {
         User currentUser = this.getCurrentUser(authentication);
 

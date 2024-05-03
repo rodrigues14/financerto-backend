@@ -6,7 +6,6 @@ import java.time.LocalDate;
 
 public record ExpenseResponseDTO (
         String id,
-        String userId,
         Double amount,
         String description,
         LocalDate date,
@@ -15,7 +14,7 @@ public record ExpenseResponseDTO (
         CategoryExpense category
 ) {
     public ExpenseResponseDTO(Expense expense) {
-        this(expense.getId(),expense.getUser().getId(), expense.getAmount(),
+        this(expense.getId(), expense.getAmount(),
                 expense.getDescription(), expense.getDate(), expense.getMethod(),
                 expense.getLocal(), expense.getCategory());
     }

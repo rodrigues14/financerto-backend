@@ -1,13 +1,14 @@
 package com.lucasdev.financerto.controller;
 
 import com.lucasdev.financerto.domain.expense.*;
-import com.lucasdev.financerto.domain.user.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,47 +21,34 @@ public class ExpenseController {
     private ExpenseRepository expenseRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private ExpenseService expenseService;
 
     @PostMapping
     @Transactional
-    public ResponseEntity register(@RequestBody ExpenseDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        var user = userRepository.findById(data.userId());
-        if (user.isPresent()) {
-            var expense = new Expense(user.get(), data);
-            expenseRepository.save(expense);
-
-            var uri = uriComponentsBuilder.path("/expense/{id}").buildAndExpand(expense.getId()).toUri();
-            return ResponseEntity.created(uri).body(new ExpenseResponseDTO(expense));
-        }
-        return ResponseEntity.badRequest().body("Invalid user id");
+    public ResponseEntity<ExpenseResponseDTO> registerExpense(@RequestBody @Valid ExpenseDTO data, UriComponentsBuilder uriComponentsBuilder, Authentication authentication) {
+        return this.expenseService.registerExpense(data, uriComponentsBuilder, authentication);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity findbyId(@PathVariable String id) {
-        var expense = expenseRepository.getReferenceById(id);
-        return ResponseEntity.ok(new ExpenseResponseDTO(expense));
+    public ResponseEntity<ExpenseResponseDTO> findExpenseById(@PathVariable String id, Authentication authentication) {
+        return this.expenseService.findExpenseById(id, authentication);
     }
 
     @GetMapping
-    public ResponseEntity<Page<ExpenseResponseDTO>> list(@PageableDefault(size = 10, sort = {"date"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        var page = expenseRepository.findAll(pageable).map(ExpenseResponseDTO::new);
-        return ResponseEntity.ok(page);
+    public ResponseEntity<Page<ExpenseResponseDTO>> list(@PageableDefault(size = 10, sort = {"date"}, direction = Sort.Direction.DESC) Pageable pageable, Authentication authentication) {
+        return this.expenseService.listExpenses(pageable, authentication);
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity update(@RequestBody ExpenseUpdateDTO data) {
-        var expense = expenseRepository.getReferenceById(data.id());
-        expense.update(data);
-        return ResponseEntity.ok(new ExpenseResponseDTO(expense));
+    public ResponseEntity<ExpenseResponseDTO> update(@RequestBody @Valid ExpenseUpdateDTO data, Authentication authentication) {
+        return this.expenseService.updateExpense(data, authentication);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity delete(@PathVariable String id) {
-        expenseRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity delete(@PathVariable String id, Authentication authentication) {
+        return this.expenseService.deleteExpense(id, authentication);
     }
 
 }

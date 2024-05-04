@@ -1,7 +1,6 @@
 package com.lucasdev.financerto.controller;
 
 import com.lucasdev.financerto.domain.revenue.*;
-import com.lucasdev.financerto.domain.user.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,47 +21,34 @@ public class RevenueController {
     private RevenueRepository revenueRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private RevenueService revenueService;
 
     @PostMapping
     @Transactional
-    public ResponseEntity register(@RequestBody @Valid RevenueDTO data, UriComponentsBuilder uriComponentsBuilder) {
-        var user = userRepository.findById(data.userId());
-        if (user.isPresent()) {
-            Revenue revenue = new Revenue(user.get(), data);
-            revenueRepository.save(revenue);
-
-            var uri = uriComponentsBuilder.path("/revenue/{id}").buildAndExpand(revenue.getId()).toUri();
-            return ResponseEntity.created(uri).body(new RevenueResponseDTO(revenue));
-        }
-        return ResponseEntity.badRequest().body("Invalid user id");
+    public ResponseEntity<RevenueResponseDTO> registerRevenue(@RequestBody @Valid RevenueDTO data, UriComponentsBuilder uriComponentsBuilder, Authentication authentication) {
+        return this.revenueService.registerRevenue(data, uriComponentsBuilder, authentication);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity findById(@PathVariable String id) {
-        var revenue = revenueRepository.getReferenceById(id);
-        return ResponseEntity.ok(new RevenueResponseDTO(revenue));
+    public ResponseEntity<RevenueResponseDTO> findRevenueById(@PathVariable String id, Authentication authentication) {
+        return this.revenueService.findRevenueById(id, authentication);
     }
 
     @GetMapping
-    public ResponseEntity<Page<RevenueResponseDTO>> list(@PageableDefault(size = 10, sort = {"date"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        var page = revenueRepository.findAll(pageable).map(RevenueResponseDTO::new);
-        return ResponseEntity.ok(page);
+    public ResponseEntity<Page<RevenueResponseDTO>> listRevenues(@PageableDefault(size = 10, sort = {"date"}, direction = Sort.Direction.DESC) Pageable pageable, Authentication authentication) {
+        return this.revenueService.listRevenues(pageable, authentication);
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity update(@RequestBody @Valid RevenueUpdateDTO data) {
-        var revenue = revenueRepository.getReferenceById(data.id());
-        revenue.update(data);
-        return ResponseEntity.ok(new RevenueResponseDTO(revenue));
+    public ResponseEntity<RevenueResponseDTO> updateRevenue(@RequestBody @Valid RevenueUpdateDTO data, Authentication authentication) {
+        return this.revenueService.updateRevenue(data, authentication);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity delete(@PathVariable String id) {
-        revenueRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity deleteRevenue(@PathVariable String id, Authentication authentication) {
+        return this.revenueService.deleteRevenue(id, authentication);
     }
 
 }

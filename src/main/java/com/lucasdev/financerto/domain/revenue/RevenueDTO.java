@@ -1,22 +1,17 @@
 package com.lucasdev.financerto.domain.revenue;
 
 import com.lucasdev.financerto.domain.financetransaction.Methods;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
 public record RevenueDTO(
-        @NotBlank
-        String userId,
         @NotNull
         @Positive
         Double amount,
         String description,
         @NotNull
-        @Past
+        @PastOrPresent
         LocalDate date,
         @NotNull
         Methods method,
@@ -24,7 +19,7 @@ public record RevenueDTO(
         CategoryRevenue category
 ) {
     public RevenueDTO(Revenue revenue) {
-        this(revenue.getUser().getId(), revenue.getAmount(), revenue.getDescription(),
+        this(revenue.getAmount(), revenue.getDescription(),
                 revenue.getDate(), revenue.getMethod(), revenue.getCategory());
     }
 }

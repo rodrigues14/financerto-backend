@@ -1,10 +1,7 @@
 package com.lucasdev.financerto.domain.revenue;
 
 import com.lucasdev.financerto.domain.financetransaction.Methods;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -13,7 +10,7 @@ public record RevenueUpdateDTO(
         @Positive
         Double amount,
         String description,
-        @Past
+        @PastOrPresent
         LocalDate date,
         Methods method,
         CategoryRevenue category

@@ -3,22 +3,16 @@ package com.lucasdev.financerto.domain.target;
 import com.lucasdev.financerto.domain.target.validations.ValidateTargetAndCurrentAmountToRegister;
 import com.lucasdev.financerto.domain.target.validations.ValidateTargetAndCurrentAmountToUpdate;
 import com.lucasdev.financerto.domain.user.User;
-import com.lucasdev.financerto.domain.user.UserRepository;
 import com.lucasdev.financerto.utils.RecoverAuthenticatedUser;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
-
 
 @Service
 public class TargetService {
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private TargetRepository targetRepository;
@@ -32,51 +26,46 @@ public class TargetService {
     @Autowired
     private RecoverAuthenticatedUser recoverAuthenticatedUser;
 
-    public ResponseEntity register(Authentication authentication ,TargetDTO data, UriComponentsBuilder uriComponentsBuilder) {
+    public TargetResponseDTO registerTarget(Authentication authentication ,TargetDTO data) {
         User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
-
         validateTargetAndCurrentAmountToRegister.validate(data);
         var target = new Target(currentUser, data);
         targetRepository.save(target);
-        var uri = uriComponentsBuilder.path("/target/{id}").buildAndExpand(target.getId()).toUri();
-        return ResponseEntity.created(uri).body(new TargetResponseDTO(target));
+        return new TargetResponseDTO(target);
     }
 
-    public ResponseEntity findById(Authentication authentication, String id) {
+    public TargetResponseDTO findTargetById(Authentication authentication, String id) {
         User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
         var target = targetRepository.getReferenceById(id);
         if (!target.getUser().equals(currentUser)) {
-            return ResponseEntity.notFound().build();
+            throw new EntityNotFoundException();
         }
-        return ResponseEntity.ok(new TargetResponseDTO(target));
+        return new TargetResponseDTO(target);
     }
 
-    public ResponseEntity<Page<TargetResponseDTO>> list(Authentication authentication, Pageable pageable) {
+    public Page<TargetResponseDTO> listTargets(Authentication authentication, Pageable pageable) {
         User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
-
-        var page = targetRepository.findAllByUserId(currentUser.getId() ,pageable).map(TargetResponseDTO::new);
-        return ResponseEntity.ok(page);
+        return targetRepository.findAllByUserId(currentUser.getId() ,pageable).map(TargetResponseDTO::new);
     }
 
-    public ResponseEntity update(Authentication authentication, TargetUpdateDTO data) {
+    public TargetResponseDTO updateTarget(Authentication authentication, TargetUpdateDTO data) {
         User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
         var target = targetRepository.getReferenceById(data.id());
         if (!target.getUser().equals(currentUser)) {
-            return ResponseEntity.notFound().build();
+            throw new EntityNotFoundException();
         }
         validateTargetAndCurrentAmountToUpdate.validate(data);
         target.update(data);
-        return ResponseEntity.ok(new TargetResponseDTO(target));
+        return new TargetResponseDTO(target);
     }
 
-    public ResponseEntity delete(Authentication authentication, String id) {
+    public void deleteTarget(Authentication authentication, String id) {
         User currentUser = recoverAuthenticatedUser.getCurrentUser(authentication);
         var target = targetRepository.findById(id).orElse(null);
         if (target == null || !target.getUser().equals(currentUser)) {
-            return ResponseEntity.badRequest().build();
+            throw new EntityNotFoundException();
         }
         targetRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 
 }

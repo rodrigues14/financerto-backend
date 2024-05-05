@@ -18,37 +18,40 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ExpenseController {
 
     @Autowired
-    private ExpenseRepository expenseRepository;
-
-    @Autowired
     private ExpenseService expenseService;
 
     @PostMapping
     @Transactional
     public ResponseEntity<ExpenseResponseDTO> registerExpense(@RequestBody @Valid ExpenseDTO data, UriComponentsBuilder uriComponentsBuilder, Authentication authentication) {
-        return this.expenseService.registerExpense(data, uriComponentsBuilder, authentication);
+        ExpenseResponseDTO dto = this.expenseService.registerExpense(data, authentication);
+        var uri = uriComponentsBuilder.path("/expense/{id}").buildAndExpand(dto.id()).toUri();
+        return ResponseEntity.created(uri).body(dto);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ExpenseResponseDTO> findExpenseById(@PathVariable String id, Authentication authentication) {
-        return this.expenseService.findExpenseById(id, authentication);
+        ExpenseResponseDTO dto = this.expenseService.findExpenseById(id, authentication);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping
-    public ResponseEntity<Page<ExpenseResponseDTO>> list(@PageableDefault(size = 10, sort = {"date"}, direction = Sort.Direction.DESC) Pageable pageable, Authentication authentication) {
-        return this.expenseService.listExpenses(pageable, authentication);
+    public ResponseEntity<Page<ExpenseResponseDTO>> listExpenses(@PageableDefault(size = 10, sort = {"date"}, direction = Sort.Direction.DESC) Pageable pageable, Authentication authentication) {
+        Page<ExpenseResponseDTO> page = this.expenseService.listExpenses(pageable, authentication);
+        return ResponseEntity.ok(page);
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity<ExpenseResponseDTO> update(@RequestBody @Valid ExpenseUpdateDTO data, Authentication authentication) {
-        return this.expenseService.updateExpense(data, authentication);
+    public ResponseEntity updateExpense(@RequestBody @Valid ExpenseUpdateDTO data, Authentication authentication) {
+        ExpenseResponseDTO expenseUpdate = this.expenseService.updateExpense(data, authentication);
+        return ResponseEntity.ok(expenseUpdate);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity delete(@PathVariable String id, Authentication authentication) {
-        return this.expenseService.deleteExpense(id, authentication);
+    public ResponseEntity deleteExpense(@PathVariable String id, Authentication authentication) {
+        this.expenseService.deleteExpense(id, authentication);
+        return ResponseEntity.noContent().build();
     }
 
 }

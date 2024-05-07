@@ -1,4 +1,4 @@
-package com.lucasdev.financerto.infra.exceptions;
+package com.lucasdev.financerto.exceptions;
 
 public class ValidateException extends RuntimeException{
     public ValidateException(String message) {

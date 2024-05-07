@@ -2,7 +2,7 @@ package com.lucasdev.financerto.domain.target.validations;
 
 import com.lucasdev.financerto.domain.target.TargetRepository;
 import com.lucasdev.financerto.domain.target.TargetUpdateDTO;
-import com.lucasdev.financerto.infra.exceptions.ValidateException;
+import com.lucasdev.financerto.exceptions.ValidateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

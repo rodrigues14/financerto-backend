@@ -1,7 +1,7 @@
 package com.lucasdev.financerto.controller;
 
 import com.lucasdev.financerto.domain.target.*;
-import com.lucasdev.financerto.infra.exceptions.ValidateException;
+import com.lucasdev.financerto.exceptions.ValidateException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -3,6 +3,8 @@ package com.lucasdev.financerto.domain.revenue;
 import com.lucasdev.financerto.domain.financetransaction.FinanceTransaction;
 import com.lucasdev.financerto.domain.user.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Revenue extends FinanceTransaction {
+    @Enumerated(EnumType.STRING)
     private CategoryRevenue category;
 
     public Revenue(User user, RevenueDTO data) {

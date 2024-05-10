@@ -13,8 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class ValidateTargetAndCurrentAmountToUpdateTest {
 
@@ -22,74 +20,111 @@ class ValidateTargetAndCurrentAmountToUpdateTest {
     private TargetRepository targetRepository;
 
     @InjectMocks
-    ValidateTargetAndCurrentAmountToUpdate validateUpdate = new ValidateTargetAndCurrentAmountToUpdate();
+    private ValidateTargetAndCurrentAmountToUpdate validate;
+
+    @Mock
+    private TargetUpdateDTO targetUpdateDTO;
+
+    @Mock
+    private Target targetBeforeUpdate;
 
     @Test
     @DisplayName("Should return an exception when the current amount greater than the target and")
     void bothDifferentFromNullCase01() {
-        TargetUpdateDTO dto = new TargetUpdateDTO(
-                null,"Test", 1000.0, 1200.0, null, null
-        );
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(1000.0);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(1100.0);
 
-        Assertions.assertThrows(ValidateException.class, () -> validateUpdate.validate(dto));
+        Assertions.assertThrows(ValidateException.class, () -> validate.validate(targetUpdateDTO));
     }
 
     @Test
-    @DisplayName("Must confirm, when the current amount is less than or equal to the target and")
+    @DisplayName("No should return an exception when the current amount is less than the target and")
     void bothDifferentFromNullCase02() {
-        TargetUpdateDTO dto = new TargetUpdateDTO(
-                null,"Test", 1000.0, 900.0, null, null
-        );
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(1000.0);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(900.0);
 
-        Assertions.assertDoesNotThrow(() -> validateUpdate.validate(dto));
+        Assertions.assertDoesNotThrow(() -> validate.validate(targetUpdateDTO));
+    }
+
+    @Test
+    @DisplayName("No should return an exception when the current amount is igual to the target and")
+    void bothDifferentFromNullCase03() {
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(1000.0);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(1000.0);
+
+        Assertions.assertDoesNotThrow(() -> validate.validate(targetUpdateDTO));
     }
 
     @Test
     @DisplayName("Should return an exception when the current Amount (has not been updated) is greater than the target(has been updated)")
     void currentAmountIsNullAndTheTargetIsNotCase1() {
-        Target target = new Target(
-                "id5", null, null, 1000.0, 800.0, null, null, null
-        );
-        TargetUpdateDTO dto = new TargetUpdateDTO("ab5", null, 500.0, null, null, null);
+        BDDMockito.given(targetRepository.getReferenceById(targetUpdateDTO.id())).willReturn(targetBeforeUpdate);
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(800.0);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(null);
 
-        BDDMockito.given(targetRepository.getReferenceById(dto.id())).willReturn(target);
-        Assertions.assertThrows(ValidateException.class, () -> validateUpdate.validate(dto));
+        BDDMockito.given(targetBeforeUpdate.getCurrentAmount()).willReturn(1000.0);
+
+        Assertions.assertThrows(ValidateException.class, () -> validate.validate(targetUpdateDTO));
     }
 
     @Test
-    @DisplayName("Must confirm, when the current Amount (has not been updated) is less than or equal to the target(has been updated)")
+    @DisplayName("No should return an exception when the current Amount (has not been updated) is less than the target(has been updated)")
     void currentAmountIsNullAndTheTargetIsNotCase2() {
-        Target target = new Target(
-                "id5", null, null, 1000.0, 800.0, null, null, null
-        );
-        TargetUpdateDTO dto = new TargetUpdateDTO("ab5", null, 800.0, null, null, null);
+        BDDMockito.given(targetRepository.getReferenceById(targetUpdateDTO.id())).willReturn(targetBeforeUpdate);
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(1500.0);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(null);
 
-        BDDMockito.given(targetRepository.getReferenceById(dto.id())).willReturn(target);
-        Assertions.assertDoesNotThrow(() -> validateUpdate.validate(dto));
+        BDDMockito.given(targetBeforeUpdate.getCurrentAmount()).willReturn(1000.0);
+
+        Assertions.assertDoesNotThrow(() -> validate.validate(targetUpdateDTO));
     }
 
     @Test
-    @DisplayName("Should return an exception when current amount (has been updated) is greater then the target (has not been updated)")
+    @DisplayName("No should return an exception when the current Amount (has not been updated) is equal than the target(has been updated)")
+    void currentAmountIsNullAndTheTargetIsNotCase3() {
+        BDDMockito.given(targetRepository.getReferenceById(targetUpdateDTO.id())).willReturn(targetBeforeUpdate);
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(1000.0);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(null);
+
+        BDDMockito.given(targetBeforeUpdate.getCurrentAmount()).willReturn(1000.0);
+
+        Assertions.assertDoesNotThrow(() -> validate.validate(targetUpdateDTO));
+    }
+
+    @Test
+    @DisplayName("Should return an exception when current amount (has been updated) is greater than the target (has not been updated)")
     void targetAmountIsNullAndTheCurrentIsNotCase1() {
-        Target target = new Target(
-                "id5", null, null, 1000.0, 700.0, null, null, null
-        );
-        TargetUpdateDTO dto = new TargetUpdateDTO("ab5", null, null, 1100.0, null, null);
+        BDDMockito.given(targetRepository.getReferenceById(targetUpdateDTO.id())).willReturn(targetBeforeUpdate);
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(null);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(2000.0);
 
-        BDDMockito.given(targetRepository.getReferenceById(dto.id())).willReturn(target);
-        Assertions.assertThrows(ValidateException.class, () -> validateUpdate.validate(dto));
+        BDDMockito.given(targetBeforeUpdate.getTargetAmount()).willReturn(1500.0);
+
+        Assertions.assertThrows(ValidateException.class, () -> validate.validate(targetUpdateDTO));
     }
 
     @Test
-    @DisplayName("Must confirm, when current amount (has been updated) is less then or equal to the target (has not been updated)")
+    @DisplayName("No should return an exception when current amount (has been updated) is less than the target (has not been updated)")
     void targetAmountIsNullAndTheCurrentIsNotCase2() {
-        Target target = new Target(
-                "id5", null, null, 1000.0, 700.0, null, null, null
-        );
-        TargetUpdateDTO dto = new TargetUpdateDTO("ab5", null, null, 900.0, null, null);
+        BDDMockito.given(targetRepository.getReferenceById(targetUpdateDTO.id())).willReturn(targetBeforeUpdate);
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(null);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(1000.0);
 
-        BDDMockito.given(targetRepository.getReferenceById(dto.id())).willReturn(target);
-        Assertions.assertDoesNotThrow(() -> validateUpdate.validate(dto));
+        BDDMockito.given(targetBeforeUpdate.getTargetAmount()).willReturn(1500.0);
+
+        Assertions.assertDoesNotThrow(() -> validate.validate(targetUpdateDTO));
+    }
+
+    @Test
+    @DisplayName("No should return an exception when current amount (has been updated) is equal to the target (has not been updated)")
+    void targetAmountIsNullAndTheCurrentIsNotCase3() {
+        BDDMockito.given(targetRepository.getReferenceById(targetUpdateDTO.id())).willReturn(targetBeforeUpdate);
+        BDDMockito.given(targetUpdateDTO.targetAmount()).willReturn(null);
+        BDDMockito.given(targetUpdateDTO.currentAmount()).willReturn(1500.0);
+
+        BDDMockito.given(targetBeforeUpdate.getTargetAmount()).willReturn(1500.0);
+
+        Assertions.assertDoesNotThrow(() -> validate.validate(targetUpdateDTO));
     }
 
 }

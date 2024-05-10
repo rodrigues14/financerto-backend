@@ -3,33 +3,44 @@ package com.lucasdev.financerto.domain.target.validations;
 import com.lucasdev.financerto.domain.target.TargetDTO;
 import com.lucasdev.financerto.exceptions.ValidateException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+@ExtendWith(MockitoExtension.class)
 class ValidateTargetAndCurrentAmountToRegisterTest {
 
-    ValidateTargetAndCurrentAmountToRegister validate = new ValidateTargetAndCurrentAmountToRegister();
+    @InjectMocks
+    private ValidateTargetAndCurrentAmountToRegister validate;
+
+    @Mock
+    private TargetDTO targetDTO;
 
     @Test
-    @DisplayName("Should return an exception because the current amount is greater than or equal to the target")
-    void currentAmountGreaterThanOrEqualToTarget() {
-        TargetDTO dto = new TargetDTO(
-                "Test", 1000.0, 1000.0, null, null
-        );
+    void currentValueShouldBeGreaterThanTheCurrentAmount() {
+        BDDMockito.given(targetDTO.targetAmount()).willReturn(1000.0);
+        BDDMockito.given(targetDTO.currentAmount()).willReturn(700.0);
 
-        Assertions.assertThrows(ValidateException.class, () -> validate.validate(dto));
+        Assertions.assertDoesNotThrow(() -> validate.validate(targetDTO));
     }
 
     @Test
-    @DisplayName("It should be allowed, because the current amount is lower than the target")
-    void currentAmountLessThanTarget() {
-        TargetDTO dto = new TargetDTO(
-                "Test", 1000.0, 800.0, null, null
-        );
+    void shouldReturnExceptionWhenCurrentAmountIsGreaterThanTarget() {
+        BDDMockito.given(targetDTO.targetAmount()).willReturn(1000.0);
+        BDDMockito.given(targetDTO.currentAmount()).willReturn(1200.0);
 
-        Assertions.assertDoesNotThrow(() -> validate.validate(dto));
+        Assertions.assertThrows(ValidateException.class, () -> validate.validate(targetDTO));
+    }
+
+    @Test
+    void shouldReturnExceptionWhenCurrentAmountIsEqualToTarget() {
+        BDDMockito.given(targetDTO.targetAmount()).willReturn(1000.0);
+        BDDMockito.given(targetDTO.currentAmount()).willReturn(1000.0);
+
+        Assertions.assertThrows(ValidateException.class, () -> validate.validate(targetDTO));
     }
 
 }

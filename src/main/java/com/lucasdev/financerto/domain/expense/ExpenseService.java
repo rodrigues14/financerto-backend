@@ -1,7 +1,6 @@
 package com.lucasdev.financerto.domain.expense;
 
 import com.lucasdev.financerto.domain.user.User;
-import com.lucasdev.financerto.domain.user.UserRepository;
 import com.lucasdev.financerto.utils.RecoverAuthenticatedUser;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

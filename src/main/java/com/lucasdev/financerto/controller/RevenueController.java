@@ -1,6 +1,7 @@
 package com.lucasdev.financerto.controller;
 
 import com.lucasdev.financerto.domain.revenue.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/revenue")
+@SecurityRequirement(name = "bearer-key")
 public class RevenueController {
 
     @Autowired

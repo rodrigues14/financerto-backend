@@ -6,6 +6,7 @@
   <a href="#technologies">Technologies</a> •
   <a href="#configuration">Installation and Configuration</a> •
   <a href="#endpoints">Endpoints</a> •
+  <a href="#license">License</a> •
   <a href="#author">Author</a>
 </p>
 
@@ -93,6 +94,8 @@ git clone https://github.com/rodrigues14/financerto-backend.git
 
 ![swagger](./src/main/resources/static/swagger.png)
 
-<h2 id="author">🧑‍💻 Author</h2>
+<h2 id="license">📃 License</h2>
+This project is under [MIT](./LICENSE) license.
 
+<h2 id="author">🧑‍💻 Author</h2>
 The Financerto project was developed by [Lucas Rodrigues](https://www.linkedin.com/in/lucas-rodrigues-perfil/).

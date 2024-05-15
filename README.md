@@ -89,6 +89,10 @@ git clone https://github.com/rodrigues14/financerto-backend.git
 }
 ```
 
+### All endpoints
+
+![swagger](./src/main/resources/static/swagger.png)
+
 <h2 id="author">🧑‍💻 Author</h2>
 
 The Financerto project was developed by [Lucas Rodrigues](https://www.linkedin.com/in/lucas-rodrigues-perfil/).
